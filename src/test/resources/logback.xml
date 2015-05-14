@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="stdoutAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+		</layout>
+	</appender>
+		
+
+	<logger name="com.duoqu.demo.java8" level="DEBUG" />
+
+    <root level="DEBUG">
+        <appender-ref ref="stdoutAppender"/>
+    </root>
+
+
+</configuration> 

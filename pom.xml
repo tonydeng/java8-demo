@@ -29,6 +29,12 @@
           <version>${logback.version}</version>
           <scope>provided</scope>
       </dependency>
+      <dependency>
+          <groupId>com.duoqu.commons</groupId>
+          <artifactId>commons-utils</artifactId>
+          <version>1.0.1</version>
+          <scope>provided</scope>
+      </dependency>
   </dependencies>
 
     <build>

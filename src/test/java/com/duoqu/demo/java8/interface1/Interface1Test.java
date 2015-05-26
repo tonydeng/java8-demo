@@ -1,4 +1,4 @@
-package com.duoqu.demo.java8;
+package com.duoqu.demo.java8.interface1;
 
 import com.duoqu.demo.java8.BaseTest;
 import org.junit.Assert;
@@ -24,4 +24,5 @@ public class Interface1Test extends BaseTest {
         Assert.assertTrue((0 == Interface1.Formula.positive(-4)));
         log.info("-4 positive:'{}'", Interface1.Formula.positive(-4));
     }
+
 }

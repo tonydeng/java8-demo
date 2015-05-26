@@ -22,4 +22,9 @@ public class Lambda1 {
         Collections.sort(list,(a,b) -> b.compareTo(a));
         return list;
     }
+
+    @FunctionalInterface
+    interface Converter<F,T>{
+        T convert(F form);
+    }
 }

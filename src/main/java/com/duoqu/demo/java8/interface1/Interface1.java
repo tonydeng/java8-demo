@@ -1,4 +1,4 @@
-package com.duoqu.demo.java8;
+package com.duoqu.demo.java8.interface1;
 
 /**
  * Created by tonydeng on 15/5/15.

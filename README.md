@@ -358,3 +358,180 @@ Sorted是一个连续操作，它返回流的已排序版本。如果你没有�
     System.out.println(stringCollection);  
     // ddd2, aaa2, bbb1, aaa1, bbb3, ccc, bbb2, ddd1  
 ```
+
+
+#### Map
+连续性操作map通过指定的Function将流中的每个元素转变为另外的对象。下面的示例将每个字符串转换为大写的字符串。此外，你也可以使用map将每个元素的类型改变为其它类型。转换后流的泛型类型依赖于你传入的Function的泛型类型。
+
+```
+    stringCollection  
+        .stream()  
+        .map(String::toUpperCase)  
+        .sorted((a, b) -> b.compareTo(a))  
+        .forEach(System.out::println);  
+      
+    // "DDD2", "DDD1", "CCC", "BBB3", "BBB2", "AAA2", "AAA1"  
+```
+
+
+#### Match
+各种匹配操作可以用来检测是否某种predicate和流中元素相匹配。所有的这些操作是中断的并返回一个boolean结果。
+
+```
+    boolean anyStartsWithA =   
+        stringCollection  
+            .stream()  
+            .anyMatch((s) -> s.startsWith("a"));  
+      
+    System.out.println(anyStartsWithA);      // true  
+      
+    boolean allStartsWithA =   
+        stringCollection  
+            .stream()  
+            .allMatch((s) -> s.startsWith("a"));  
+      
+    System.out.println(allStartsWithA);      // false  
+      
+    boolean noneStartsWithZ =   
+        stringCollection  
+            .stream()  
+            .noneMatch((s) -> s.startsWith("z"));  
+      
+    System.out.println(noneStartsWithZ);      // true  
+ ```
+ 
+#### Count
+Count是中断型操作，它返回流中的元素数量。
+
+```
+    long startsWithB =   
+        stringCollection  
+            .stream()  
+            .filter((s) -> s.startsWith("b"))  
+            .count();  
+      
+    System.out.println(startsWithB);    // 3  
+```
+
+#### Reduce
+这个中断性操作使用指定的function对流中元素实施消减策略。此操作的返回值是一个包括所有被消减元素的Optional。
+
+```
+    Optional<String> reduced =  
+        stringCollection  
+            .stream()  
+            .sorted()  
+            .reduce((s1, s2) -> s1 + "#" + s2);  
+      
+    reduced.ifPresent(System.out::println);  
+    // "aaa1#aaa2#bbb1#bbb2#bbb3#ccc#ddd1#ddd2"  
+```
+
+### Parallel Streams
+在前面部分我们提到流可以是顺序的也可以是并行的。顺序流的操作是在单线程上执行的，而并行流的操作是在多线程上并发执行的。
+
+随后的例子我们展示了并行流可以多么容易的提高性能。
+
+首先，我们创建一个包含唯一元素的大容器：
+
+```
+    int max = 1000000;  
+    List<String> values = new ArrayList<>(max);  
+    for (int i = 0; i < max; i++) {  
+        UUID uuid = UUID.randomUUID();  
+        values.add(uuid.toString());  
+    }  
+```
+
+现在我们开始测试排序这些元素需要多长时间。
+
+**Sequential Sort**
+
+```
+    long t0 = System.nanoTime();  
+      
+    long count = values.stream().sorted().count();  
+    System.out.println(count);  
+      
+    long t1 = System.nanoTime();  
+      
+    long millis = TimeUnit.NANOSECONDS.toMillis(t1 - t0);  
+    System.out.println(String.format("sequential sort took: %d ms", millis));  
+      
+    // sequential sort took: 899 ms  
+```
+
+
+**Parallel Sort**
+
+```
+    long t0 = System.nanoTime();  
+      
+    long count = values.parallelStream().sorted().count();  
+    System.out.println(count);  
+      
+    long t1 = System.nanoTime();  
+      
+    long millis = TimeUnit.NANOSECONDS.toMillis(t1 - t0);  
+    System.out.println(String.format("parallel sort took: %d ms", millis));  
+      
+    // parallel sort took: 472 ms  
+```
+你会观察到这两种模式的代码基本上是一致的，但是并行排序所花费的时间大约是顺序排序的一半。
+
+
+### Map
+我们已经提到maps不支持流。然而现在maps包括了许多新的非常有用的方法用于执行通用任务。
+
+```
+    Map<Integer, String> map = new HashMap<>();  
+      
+    for (int i = 0; i < 10; i++) {  
+        map.putIfAbsent(i, "val" + i);  
+    }  
+      
+    map.forEach((id, val) -> System.out.println(val));  
+```
+
+上述的代码应该很清晰了：putIfAbsent使得我们不用写是否为null值的检测语句；forEach使用consumer来对map中的每个元素进行操作。下面的例子向我们展示使用功能性函数在map里执行代码：
+
+```
+    map.computeIfPresent(3, (num, val) -> val + num);  
+    map.get(3);             // val33  
+      
+    map.computeIfPresent(9, (num, val) -> null);  
+    map.containsKey(9);     // false  
+      
+    map.computeIfAbsent(23, num -> "val" + num);  
+    map.containsKey(23);    // true  
+      
+    map.computeIfAbsent(3, num -> "bam");  
+    map.get(3);             // val33  
+```
+
+接下来，我们将学习如何删除给定键所对应的元素。删除操作还需要满足给定的值需要和map中的值想等：
+
+```
+    map.remove(3, "val3");  
+    map.get(3);             // val33  
+      
+    map.remove(3, "val33");  
+    map.get(3);             // null  
+```
+
+其他一些帮助性方法：
+
+```
+    map.getOrDefault(42, "not found");  // not found  
+```
+
+
+合并map中的实体是十分容易的：
+
+```
+    map.merge(9, "val9", (value, newValue) -> value.concat(newValue));  
+    map.get(9);             // val9  
+      
+    map.merge(9, "concat", (value, newValue) -> value.concat(newValue));  
+    map.get(9);             // val9concat  
+```

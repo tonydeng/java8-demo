@@ -481,6 +481,7 @@ Count是中断型操作，它返回流中的元素数量。
 
 
 ### Map
+
 我们已经提到maps不支持流。然而现在maps包括了许多新的非常有用的方法用于执行通用任务。
 
 ```
@@ -535,3 +536,204 @@ Count是中断型操作，它返回流中的元素数量。
     map.merge(9, "concat", (value, newValue) -> value.concat(newValue));  
     map.get(9);             // val9concat  
 ```
+
+如果map不存在指定的键，那么它将把该键值对key/value加入map中。反而，如果存在，它将调用function来进行合并操作。
+
+### Date API
+
+Java8在包java.time下面包括了一款新的date和time的API。新的Date API和Joda-Time库是相兼容的，但是它们不是一样的。下面的示例覆盖了新API中的重要部分。
+
+#### Clock
+
+Clock提供了访问当前日期和时间的方法。Clock是时区敏感的并且它可以被用来替代System.currentTimeMillis进行获取当前毫秒数。同时，时间轴上的时间点是可以用类Instant来表示的。Instants可以被用来创建遗留的java.util.Date对象。
+
+```
+    Clock clock = Clock.systemDefaultZone();  
+    long millis = clock.millis();  
+      
+    Instant instant = clock.instant();  
+    Date legacyDate = Date.from(instant);   // legacy java.util.Date  
+```
+
+#### TimeZones
+
+TimeZones被用来表示ZoneId。它们可以通过静态工厂方法访问。TImeZones定义了时差，它在instants和本地日期时间转换上十分重要。
+
+```
+    System.out.println(ZoneId.getAvailableZoneIds());  
+    // prints all available timezone ids  
+      
+    ZoneId zone1 = ZoneId.of("Europe/Berlin");  
+    ZoneId zone2 = ZoneId.of("Brazil/East");  
+    System.out.println(zone1.getRules());  
+    System.out.println(zone2.getRules());  
+      
+    // ZoneRules[currentStandardOffset=+01:00]  
+    // ZoneRules[currentStandardOffset=-03:00]  
+```
+
+#### LocalTime
+
+本地时间代表了一个和时区无关的时间，e.g. 10pm or 17:30:15. 下面的示例创建了前部分展示的两个时区的本地时间。然后，我们将比较这两个时间并计算出这两个时间在小时和分钟数上的差异。
+
+```
+    LocalTime now1 = LocalTime.now(zone1);  
+    LocalTime now2 = LocalTime.now(zone2);  
+      
+    System.out.println(now1.isBefore(now2));  // false  
+      
+    long hoursBetween = ChronoUnit.HOURS.between(now1, now2);  
+    long minutesBetween = ChronoUnit.MINUTES.between(now1, now2);  
+      
+    System.out.println(hoursBetween);       // -3  
+    System.out.println(minutesBetween);     // -239  
+```
+
+LocalTime包含了多个工厂方法用来简化创建过程，其中也包括通过字符串来创建时间：
+
+```
+    LocalTime late = LocalTime.of(23, 59, 59);  
+    System.out.println(late);       // 23:59:59  
+      
+    DateTimeFormatter germanFormatter =  
+        DateTimeFormatter  
+            .ofLocalizedTime(FormatStyle.SHORT)  
+            .withLocale(Locale.GERMAN);  
+      
+    LocalTime leetTime = LocalTime.parse("13:37", germanFormatter);  
+    System.out.println(leetTime);   // 13:37  
+```
+
+#### LocalDate
+
+LocalDate代表了一个可区分日期，e.g. 2014-03-11。 它是不变的同时工作原理类似于LocalTime。下面的例子描绘了通过加减年，月，日来计算出一个新的日期。需要注意的是这每个操作都返回一个新的实例。
+
+```
+    LocalDate today = LocalDate.now();  
+    LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);  
+    LocalDate yesterday = tomorrow.minusDays(2);  
+      
+    LocalDate independenceDay = LocalDate.of(2014, Month.JULY, 4);  
+    DayOfWeek dayOfWeek = independenceDay.getDayOfWeek();  
+    System.out.println(dayOfWeek);    // FRIDAY  
+````
+
+从字符串解析出LocalDate和解析LocalTime一样简单：
+
+```
+    DateTimeFormatter germanFormatter =  
+        DateTimeFormatter  
+            .ofLocalizedDate(FormatStyle.MEDIUM)  
+            .withLocale(Locale.GERMAN);  
+      
+    LocalDate xmas = LocalDate.parse("24.12.2014", germanFormatter);  
+    System.out.println(xmas);   // 2014-12-24  
+```
+
+#### LocalDateTime
+
+LocalDateTime代表日期和时间。它将我们前部分看到的时间和日期组合进一个实例。LocalDateTime是不可变的并且它的工作原理和LocalTime和LocalDate十分相似。
+我们可以从date-time中获取某些字段值：
+
+```
+    LocalDateTime sylvester = LocalDateTime.of(2014, Month.DECEMBER, 31, 23, 59, 59);  
+      
+    DayOfWeek dayOfWeek = sylvester.getDayOfWeek();  
+    System.out.println(dayOfWeek);      // WEDNESDAY  
+      
+    Month month = sylvester.getMonth();  
+    System.out.println(month);          // DECEMBER  
+      
+    long minuteOfDay = sylvester.getLong(ChronoField.MINUTE_OF_DAY);  
+    System.out.println(minuteOfDay);    // 1439  
+```
+
+在一些额外的时区信息帮助下，它可以被转换为instant。Instants可以被容易的转换为遗留的java.util.Date类型。
+
+```
+    Instant instant = sylvester  
+            .atZone(ZoneId.systemDefault())  
+            .toInstant();  
+      
+    Date legacyDate = Date.from(instant);  
+    System.out.println(legacyDate);     // Wed Dec 31 23:59:59 CET 2014  
+```
+
+格式date-time的过程和格式date和time基本上是一样的。在使用系统自带的定义格式时，我们也可以定义我们自己的格式：
+
+```
+    DateTimeFormatter formatter =  
+        DateTimeFormatter  
+            .ofPattern("MMM dd, yyyy - HH:mm");  
+      
+    LocalDateTime parsed = LocalDateTime.parse("Nov 03, 2014 - 07:13", formatter);  
+    String string = formatter.format(parsed);  
+    System.out.println(string);     // Nov 03, 2014 - 07:13  
+```
+
+和java.text.NumberFormat不一样的是DateTimeFormatter是不可变的并且是类型安全的。
+
+如果想了解详细的格式语法，可以阅读[这里](http://download.java.net/jdk8/docs/api/java/time/format/DateTimeFormatter.html)。
+
+
+### Annotations
+Java8中的Annotations是可重复。现在我们深入的学习一个例子来理解它。
+
+首先，我们定义一个包装注解，它包含了一个实际注解的数组。
+
+```
+    @interface Hints {  
+        Hint[] value();  
+    }  
+      
+    @Repeatable(Hints.class)  
+    @interface Hint {  
+        String value();  
+    }  
+```
+
+Java8可以使同一个注解类型同时使用多次，只要我们在注解声明时使用@Repeatable。
+
+情景1：使用容器注解
+
+```
+    @Hints({@Hint("hint1"), @Hint("hint2")})  
+    class Person {}  
+```
+
+情景2：使用可重复注解
+
+```
+    @Hint("hint1")  
+    @Hint("hint2")  
+    class Person {}  
+```
+
+在第二种情景下，java编译器隐式的在该注解使用中加入@Hints。这种后期处理在通过反射获取注解是十分重要的。
+
+```
+    Hint hint = Person.class.getAnnotation(Hint.class);  
+    System.out.println(hint);                   // null  
+      
+    Hints hints1 = Person.class.getAnnotation(Hints.class);  
+    System.out.println(hints1.value().length);  // 2  
+      
+    Hint[] hints2 = Person.class.getAnnotationsByType(Hint.class);  
+    System.out.println(hints2.length);          // 2  
+```
+
+虽然我们从来没有在类Person上声明@Hints注解，但该信息还是可以通过getAnnotation(Hint.class)获得。　此外，getAnnotationsByType是一种更加便利的方法，它可以保证我们访问所有使用的@Hint注解。
+
+此外，Java8中注解的使用范围扩展到两种新的类型：
+
+```
+    @Target({ElementType.TYPE_PARAMETER, ElementType.TYPE_USE})  
+    @interface MyAnnotation {}  
+```
+
+总结
+我的Java8语言特性教程到此就结束了。此外还有很多新的内容需要阐述。去不去了解JDK8中的这些非常棒的特性取决于你，这些特性包括有Arrays.parallelSort，StampedLock，CompletableFuture  ---即使列举名字也有很多了。我已经在网站上把这些特性都列举出来了，你可以去哪里看看。
+
+Java SE 8 API Explorer
+
+原文地址: [http://winterbe.com/posts/2014/03/16/java-8-tutorial/](http://winterbe.com/posts/2014/03/16/java-8-tutorial/)

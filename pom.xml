@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.duoqu.demo</groupId>
+  <groupId>com.github.tonydeng.demo</groupId>
   <artifactId>java8-demo</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
@@ -30,10 +30,14 @@
           <scope>provided</scope>
       </dependency>
       <dependency>
-          <groupId>com.duoqu.commons</groupId>
-          <artifactId>commons-utils</artifactId>
-          <version>1.0.1</version>
-          <scope>provided</scope>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+          <version>19.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>3.3.2</version>
       </dependency>
   </dependencies>
 
@@ -88,7 +92,7 @@
                                     <version>3.1</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>1.7</version>
+                                    <version>1.8</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -106,27 +110,6 @@
     </build>
     <repositories>
         <repository>
-            <id>duoqu maven repo</id>
-            <url>http://mvn.dq.in/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>duoqu maven snapshots repo</id>
-            <url>http://mvn.dq.in/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>oschina nexus</id>
             <url>http://maven.oschina.net/content/groups/public/</url>
             <snapshots>
@@ -141,14 +124,4 @@
             </snapshots>
         </repository>
     </repositories>
-    <distributionManagement>
-        <repository>
-            <id>duoqu-maven-repository</id>
-            <url>sftp://mvn.dq.in/dq/maven</url>
-        </repository>
-        <snapshotRepository>
-            <id>duoqu-maven-repository-snapshots</id>
-            <url>sftp://mvn.dq.in/dq/maven/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

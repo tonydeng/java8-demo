@@ -11,7 +11,7 @@
 	</appender>
 		
 
-	<logger name="com.duoqu.demo.java8" level="DEBUG" />
+	<logger name="com.github.tonydeng.demo.java8" level="DEBUG" />
 
     <root level="DEBUG">
         <appender-ref ref="stdoutAppender"/>

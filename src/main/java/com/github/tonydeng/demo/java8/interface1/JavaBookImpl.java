@@ -13,4 +13,9 @@ public class JavaBookImpl implements BookInterface {
     public void readTheBook() {
         System.out.println("Reading the Java book!");
     }
+
+    @Override
+    public void closeTheBook() {
+        System.out.println("Close the Java book!");
+    }
 }

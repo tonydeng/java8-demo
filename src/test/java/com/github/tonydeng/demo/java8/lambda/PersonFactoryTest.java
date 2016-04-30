@@ -9,10 +9,10 @@ import org.junit.Test;
 public class PersonFactoryTest extends BaseTest {
     @Test
     public void createTest() {
-        PersonFactory<Person> personPersonFactory = Person::new;
-
-        Person person = personPersonFactory.create("Tony", "Deng");
-
-        log.info("person:'{}'",person);
+//        PersonFactory<Person> personPersonFactory = Person::new;
+//
+//        Person person = personPersonFactory.create("Tony", "Deng");
+//
+//        log.info("person:'{}'",person);
     }
 }

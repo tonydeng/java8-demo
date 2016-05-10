@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Created by tonydeng on 15/5/27.
@@ -14,6 +15,15 @@ public class SteamsTest extends BaseTest {
     private static final List<String> stringCollection = Lists.newArrayList(
             "ddd2", "aaa2", "bbb1", "aaa1", "bbb3", "ccc", "bbb2", "ddd1"
     );
+
+    @Test
+    public void addTest(){
+
+        Stream<String> sl = stringCollection.stream();
+        stringCollection.add("add");
+
+        sl.forEach(log::info);
+    }
 
     @Test
     public void filterTest() {

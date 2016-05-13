@@ -17,7 +17,7 @@ import java.util.Collection;
 public class FibonacciNumbersTest {
     private static final Logger log = LoggerFactory.getLogger(FibonacciNumbersTest.class);
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "{index}: fib({0}={1})")
     public static Collection<Integer[]> data() {
         return Arrays.asList(new Integer[][]{
                 {0, 0}, {1, 1}, {2, 1},
@@ -35,7 +35,25 @@ public class FibonacciNumbersTest {
 
     @Test
     public void fibonacciNumberCall() {
-        log.info("expected {} fib {}", expected, fib(value));
+        log.info("expected {} fib(value) {}", expected, fib(value));
+        Assert.assertEquals(expected, fib(value));
+    }
+
+//    @Parameterized.Parameter
+//    public int fInput;
+//
+//    @Parameterized.Parameter(value = 1)
+//    public int fExpected;
+
+//    @Test
+//    public void testParemeter(){
+//        log.info("fExpected {} fib(fInput) {}", fExpected, fib(fInput));
+//        Assert.assertEquals(fExpected, fib(fInput));
+//    }
+
+    @Test
+    public void testParemeters(){
+        log.info("fExpected {} fib(fInput) {}", expected, fib(value));
         Assert.assertEquals(expected, fib(value));
     }
 

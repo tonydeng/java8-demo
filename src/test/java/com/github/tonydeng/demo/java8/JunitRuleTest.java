@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
+import org.junit.rules.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,15 @@ public class JunitRuleTest {
     @Rule
     public ErrorCollector collector = new ErrorCollector();
 
+    @Rule
+    public Timeout timeout = Timeout.seconds(5);
+
     @Test
+    public void testTimeout() {
+        while (true) ;
+    }
+
+    //    @Test
     public void testFileCreateAndWrite() throws IOException {
         File file = tempFolder.newFile("simple.txt");
         log.info("temp file:'{}'", file.getPath());
@@ -39,28 +48,28 @@ public class JunitRuleTest {
         Assert.assertThat(line, is("Junit Rules!"));
     }
 
-    @Test
+    //    @Test
     public void testMethodName() {
         log.info("Test method name:'{}'", name.getMethodName());
     }
 
-//    @Test
+    //    @Test
     public void testStatementCollector() {
         String s = null;
         collector.checkThat("Value should not be null", null, is(s));
 
         s = "";
 
-        collector.checkThat("Value should have the length of 1",s.length(),is(1));
+        collector.checkThat("Value should have the length of 1", s.length(), is(1));
 
         s = "Junit!";
 
-        collector.checkThat("Value should have the length of 10",s.length(),is(10));
+        collector.checkThat("Value should have the length of 10", s.length(), is(10));
 
     }
 
-//    @Test
-    public void testErrorCollector(){
+    //    @Test
+    public void testErrorCollector() {
 
         collector.addError(new Throwable("first thing went wrong"));
         collector.addError(new Throwable("second thing went wrong"));
